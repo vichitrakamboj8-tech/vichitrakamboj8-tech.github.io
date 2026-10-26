@@ -1,0 +1,3 @@
+import {configured,db,json,session,secret} from '../../../lib/server';
+export const dynamic='force-dynamic';
+export async function GET(){try{const config=await session();let remaining=null;if(configured()&&config.capacity){const rows=await db('registrations?status=eq.confirmed&select=id');remaining=Math.max(0,config.capacity-rows.length)}const ready=configured()&&Boolean(secret('RESEND_API_KEY')&&secret('EMAIL_FROM')&&secret('ADMIN_EMAIL'))&&secret('PAYMENTS_ENABLED')==='true';return json({config,demo:!ready,remaining})}catch{return json({config:await import('../../../lib/session').then(m=>m.defaults),demo:true,remaining:null})}}
